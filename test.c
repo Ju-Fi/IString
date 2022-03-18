@@ -28,4 +28,5 @@ int main() {
 	istr_free(&str);
 	istr_free(&str2);
 	istr_free(&str3);	
+	istr_free(&str4);
 }
