@@ -1,3 +1,4 @@
+istr.c
 istr.o
 test.o
 test_istr
