@@ -2,7 +2,7 @@ NAME = test_istr
 CC = gcc
 CFLAGS = -g -Wall -Wextra -pedantic -std=c11
 
-SRC = $(wildcard *.c)
+SRC = test.c
 OBJ = $(notdir $(SRC:.c=.o))
 
 all: clean build
