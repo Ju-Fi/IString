@@ -60,7 +60,6 @@ istr istr_slice(istr *str, int32_t amount_to_slice);
 
 static void istr_handle_error(enum istr_error_code code);
 
-#define ISTR_IMPLEMENT
 #ifdef ISTR_IMPLEMENT
 
 typedef struct istr_builder {
