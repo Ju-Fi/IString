@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <assert.h>
 
 typedef struct istr {
     const char *s;
@@ -32,8 +33,9 @@ uint64_t istr_index_of(istr *str, char c); //TODO: add support to get index of a
 bool istr_cmp(istr *a, istr *b);
 
 istr istr_remove(istr *str, uint64_t index);
-
 istr istr_remove_all(istr *str, char c);
+
+istr istr_slice(istr *str, int32_t amount_to_slice);
 
 #define istr_free(a) _Generic((a),        \
     istr*: _istr_free,            \
@@ -168,6 +170,23 @@ istr istr_remove_all(istr *str, char c) {
     }
 
     return res;
+}
+
+istr istr_slice(istr *str, int amount_to_slice) {
+	bool slice_end = amount_to_slice < 0;
+	if (slice_end) amount_to_slice *= -1;
+
+	assert(str->len > (size_t) amount_to_slice);
+
+	istr res = {.s = malloc(sizeof(char) * (str->len - amount_to_slice + 1)), .len = str->len - amount_to_slice};
+	if (res.s == NULL) {
+	        puts("Error allocating string");
+		exit(EXIT_FAILURE);
+	}
+
+	memcpy((void*) res.s, slice_end ? str->s : &str->s[amount_to_slice], res.len);
+
+	return res;
 }
 
 #endif
