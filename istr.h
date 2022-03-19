@@ -25,17 +25,31 @@ istr_builder_t istr_builder_create();
 
 istr istr_builder_convert(istr_builder_t *strbuild);
 
-#define istr_cat(a, b) _Generic((a),		\
-	istr *: _istr_cat_istr,			\
-	istr_builder_t *: _istr_cat_builder	\
+#define istr_cat(a, b) _Generic((a),                \
+        istr *: _istr_cat_istr,                        \
+        istr_builder_t *: _istr_cat_builder        \
 )(a, b)
-
 
 istr _istr_cat_istr(istr *a, istr *b);
 
 void _istr_cat_builder(istr_builder_t *strbuild, istr *str);
 
-uint64_t istr_index_of(istr *str, char c); // TODO: add support to get index of a string
+#define istr_free(a) _Generic((a),                \
+        istr * : _istr_free,                        \
+        istr_builder_t * : _istr_builder_free        \
+)(a)
+
+void _istr_free(istr *str);
+
+void _istr_builder_free(istr_builder_t *strbuild);
+
+#define istr_split_pop(a, b) _Generic((a),        \
+        istr * : _istr_split_pop_istr                \
+)(a, b)
+
+istr _istr_split_pop_istr(istr *str, char delimiter);
+
+int64_t istr_index_of(istr *str, char c); // TODO: add support to get index of a string
 bool istr_cmp(istr *a, istr *b);
 
 istr istr_remove(istr *str, uint64_t index);
@@ -43,15 +57,6 @@ istr istr_remove(istr *str, uint64_t index);
 istr istr_remove_all(istr *str, char c);
 
 istr istr_slice(istr *str, int32_t amount_to_slice);
-
-#define istr_free(a) _Generic((a),		\
-	istr * : _istr_free,			\
-	istr_builder_t * : _istr_builder_free	\
-)(a)
-
-void _istr_free(istr *str);
-
-void _istr_builder_free(istr_builder_t *strbuild);
 
 static void istr_handle_error(enum istr_error_code code);
 
@@ -132,7 +137,7 @@ void _istr_free(istr *str) { free((void *) str->s); }
 
 void _istr_builder_free(istr_builder_t *strbuild) { free(strbuild->sb); }
 
-uint64_t istr_index_of(istr *str, char c) {
+int64_t istr_index_of(istr *str, char c) {
         for (size_t i = 0; i < str->len; i++) {
                 if (str->s[i] == c)
                         return i;
@@ -205,12 +210,27 @@ istr istr_slice(istr *str, int amount_to_slice) {
         return res;
 }
 
+istr _istr_split_pop_istr(istr *str, char delimiter) {
+        int64_t delim_loc = istr_index_of(str, delimiter);
+        if (delim_loc != -1) {
+                istr res = istr_slice(str, (str->len - delim_loc) * -1);
+                if (res.s == NULL) {
+                        istr_handle_error(ISTR_ERROR_ALLOC);
+                        return res;
+                }
+                return res;
+        }
+        istr res = {.s = NULL, .len = 0};
+
+        return res;
+}
+
 static void istr_handle_error(enum istr_error_code code) {
 #ifndef ISTR_ERROR_NO_LOG
         switch (code) {
-        case ISTR_ERROR_ALLOC:
-                perror("Error allocating string");
-                break;
+                case ISTR_ERROR_ALLOC:
+                        perror("Error allocating string");
+                        break;
         }
 #endif
 #ifndef ISTR_ERROR_NO_EXIT

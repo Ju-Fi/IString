@@ -44,6 +44,10 @@ int main() {
         istr sliced_end = istr_slice(&str, -3);
         printf("Sliced end: %s\n", sliced_end.s);
 
+        // istr_split_pop "splits" an istring based on the given delimiter and returns the first instance of the split
+        istr split = istr_split_pop(&str2, 't');
+        printf("Split: %s %zu\n", split.s, split.len);
+
         // istrings (and builders) are freed with istr_free
         istr_free(&str);
         istr_free(&str2);
