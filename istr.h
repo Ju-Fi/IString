@@ -172,19 +172,17 @@ istr istr_remove_all(istr *str, char c) {
                 if (str->s[i] == c)
                         char_count++;
 
-        istr res = {.s = malloc(sizeof(char) * (str->len - char_count + 1)),
+        istr res = {.s = malloc(sizeof(char) * ((str->len + 1) - char_count)),
                 .len = str->len - char_count};
         if (res.s == NULL) {
                 istr_handle_error(ISTR_ERROR_ALLOC);
                 return res;
         }
 
-        uint64_t j = 0;
-        for (uint64_t i = 0; i < res.len; i++) {
+        for (uint64_t i = 0, j = 0; i < res.len + 1; i++, j++) {
                 if (str->s[j] == c)
                         j++;
                 memcpy((void *) &res.s[i], &str->s[j], 1);
-                j++;
         }
 
         return res;
@@ -205,6 +203,7 @@ istr istr_slice(istr *str, int amount_to_slice) {
         }
 
         memcpy((void *) res.s, slice_end ? str->s : &str->s[amount_to_slice], res.len);
+	memset((void*) &res.s[res.len], '\0', 1);
 
         return res;
 }

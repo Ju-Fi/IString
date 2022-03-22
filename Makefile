@@ -1,6 +1,6 @@
 NAME = test_istr
 CC = gcc
-CFLAGS = -g -Wall -Wextra -pedantic -std=c11
+CFLAGS = -g -Wall -Wextra -pedantic -std=c11 -fsanitize=address
 
 SRC = test.c
 OBJ = $(notdir $(SRC:.c=.o))
